@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import Navbar from '../components/Navbar';
 
 // Mock Data
 const INITIAL_MY_PROJECTS = [
@@ -74,6 +75,7 @@ const StudentsDashbourd = () => {
     setIsLoading(true);
     axios.get(import.meta.env.VITE_BACKEND_URL + "/api/projects", {
       headers: { Authorization: `Bearer ${token}` }
+
     }).then((res) => {
       const fetchedProjects = res.data.projects || [];
       const userId = user._id || user.id;
@@ -93,6 +95,7 @@ const StudentsDashbourd = () => {
         };
 
         const projectStudentId = project.studentId?._id || project.studentId?.id || project.studentId;
+        
         if (projectStudentId === userId) {
           myProjs.push(mappedProject);
         } else if (project.isPublic) {
@@ -177,9 +180,11 @@ const StudentsDashbourd = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 p-6 md:p-12 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-[#09090b] text-zinc-100 pt-24 pb-12 px-6 md:px-12 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -564,6 +569,7 @@ const StudentsDashbourd = () => {
         </AnimatePresence>
       </div>
     </div>
+    </>
   );
 };
 
