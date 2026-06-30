@@ -22,6 +22,7 @@ const ProjectCard = ({
   onEdit,
   onDelete,
   hoverBorderClass = 'hover:border-indigo-500/30',
+  hoverTextClass = 'group-hover:text-indigo-400',
   variants
 }) => {
   const gradient = defaultGradients[index % defaultGradients.length];
@@ -94,7 +95,7 @@ const ProjectCard = ({
       {/* ────────── CARD BODY ────────── */}
       <div className="p-6 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-1 pr-4">
+          <h3 className={`text-xl font-bold text-white ${hoverTextClass} transition-colors line-clamp-1 pr-4`}>
             {project.title}
           </h3>
           {(project.demoUrl || project.demoLink) && (
@@ -102,7 +103,7 @@ const ProjectCard = ({
               href={project.demoUrl || project.demoLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-zinc-500 hover:text-indigo-400 transition-colors shrink-0"
+              className={`text-zinc-500 ${hoverTextClass} transition-colors shrink-0`}
             >
               <ExternalLink className="w-5 h-5" />
             </a>

@@ -200,22 +200,22 @@ const StudentsDashbourd = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[#09090b] text-zinc-100 pt-24 pb-12 px-6 md:px-12 relative overflow-hidden">
+      <div className="min-h-screen bg-background text-zinc-100 pt-24 pb-12 px-6 md:px-12 relative overflow-hidden">
         {/* Background decoration */}
         <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
         <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px] pointer-events-none" />
 
-        <div className="max-w-[1400px] mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto relative z-10">
           {/* Header */}
           <header className="mb-10 flex items-center gap-3">
             <div className="bg-indigo-500/20 p-2.5 rounded-xl border border-indigo-500/30">
               <FolderGit2 className="w-6 h-6 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-                Student <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Hub</span>
+              <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                Student <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-purple-400">Dashboard</span>
               </h1>
-              <p className="text-zinc-400 text-sm mt-1">
+              <p className="text-zinc-400 text-sm md:text-base mt-1">
                 Manage your project portfolio and discover inspiring work from your peers.
               </p>
             </div>
@@ -276,7 +276,7 @@ const StudentsDashbourd = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-2">
+                        <label className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-2">
                           <Code size={14} /> Technologies Used *
                         </label>
                         <input 
@@ -289,7 +289,7 @@ const StudentsDashbourd = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-2">
+                        <label className="text-sm font-medium text-zinc-300 mb-1.5 flex items-center gap-2">
                           <ExternalLink size={14} /> Demo Link
                         </label>
                         <input 
@@ -436,6 +436,7 @@ const StudentsDashbourd = () => {
                                 setMyProjects(prev => prev.filter(p => p.id !== id));
                               }}
                               hoverBorderClass="hover:border-indigo-500/30"
+                              hoverTextClass="group-hover:text-indigo-400"
                               variants={itemVariants}
                             />
                           ))}
@@ -491,6 +492,7 @@ const StudentsDashbourd = () => {
                               isOwner={false}
                               showAuthorBadge={true}
                               hoverBorderClass="hover:border-purple-500/30"
+                              hoverTextClass="group-hover:text-purple-400"
                               variants={itemVariants}
                             />
                           ))}
@@ -528,7 +530,7 @@ const StudentsDashbourd = () => {
                           className="relative pl-6 pb-4 border-l border-zinc-800 last:border-0 last:pb-0 group"
                         >
                           {/* Timeline dot */}
-                          <div className="absolute left-[-5px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-700 ring-4 ring-zinc-900/50 group-hover:bg-indigo-400 transition-colors"></div>
+                          <div className="absolute -left-1.25 top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-700 ring-4 ring-zinc-900/50 group-hover:bg-indigo-400 transition-colors"></div>
                           
                           <p className="text-sm text-zinc-300 leading-snug mb-1">
                             {notif.message}

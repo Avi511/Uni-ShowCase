@@ -266,7 +266,7 @@ const ProjectDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4"
+            className="fixed inset-0 z-200 bg-black/90 flex items-center justify-center p-4"
             onClick={() => setLightboxOpen(false)}
           >
             <motion.div
@@ -319,13 +319,13 @@ const ProjectDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/70 flex items-center justify-center p-4"
+            className="fixed inset-0 z-200 bg-black/70 flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#18181b] border border-zinc-700 rounded-2xl p-8 max-w-sm w-full shadow-2xl"
+              className="bg-surface border border-zinc-700 rounded-2xl p-8 max-w-sm w-full shadow-2xl"
             >
               <h3 className="text-xl font-bold text-white mb-2">Delete Project?</h3>
               <p className="text-zinc-400 text-sm mb-6">
@@ -375,7 +375,7 @@ const ProjectDetail = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="relative rounded-3xl overflow-hidden bg-[#18181b] border border-zinc-800"
+              className="relative rounded-3xl overflow-hidden bg-surface border border-zinc-800"
             >
               {allImages.length > 0 ? (
                 <>
@@ -383,7 +383,7 @@ const ProjectDetail = () => {
                     className="relative h-72 sm:h-96 cursor-zoom-in"
                     onClick={() => { setLightboxIndex(activeImageIndex); setLightboxOpen(true); }}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-40 z-10`} />
+                    <div className={`absolute inset-0 bg-linear-to-br ${gradientClass} opacity-40 z-10`} />
                     <img
                       src={imgSrc(allImages[activeImageIndex])}
                       alt={project.title}
@@ -416,7 +416,7 @@ const ProjectDetail = () => {
                   )}
                 </>
               ) : (
-                <div className={`h-64 bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
+                <div className={`h-64 bg-linear-to-br ${gradientClass} flex items-center justify-center`}>
                   <span className="text-zinc-400 text-lg font-medium">No Images Provided</span>
                 </div>
               )}
@@ -466,7 +466,7 @@ const ProjectDetail = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6"
+              className="bg-surface border border-zinc-800 rounded-2xl p-6"
             >
               <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">About this project</h2>
               <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">{project.description}</p>
@@ -478,7 +478,7 @@ const ProjectDetail = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6"
+                className="bg-surface border border-zinc-800 rounded-2xl p-6"
               >
                 <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">Technologies Used</h2>
                 <div className="flex flex-wrap gap-2">
@@ -500,7 +500,7 @@ const ProjectDetail = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6"
+                className="bg-surface border border-zinc-800 rounded-2xl p-6"
               >
                 <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">Links</h2>
                 <div className="flex flex-wrap gap-3">
@@ -541,7 +541,7 @@ const ProjectDetail = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15 }}
-              className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6"
+              className="bg-surface border border-zinc-800 rounded-2xl p-6"
             >
               <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-4">Created by</h3>
               <div className="flex items-center gap-4">
@@ -586,7 +586,7 @@ const ProjectDetail = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6 space-y-3"
+              className="bg-surface border border-zinc-800 rounded-2xl p-6 space-y-3"
             >
               <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">Project Info</h3>
               <div className="flex justify-between text-sm">
@@ -617,7 +617,7 @@ const ProjectDetail = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.25 }}
-                className="bg-[#18181b] border border-indigo-500/20 rounded-2xl p-6 space-y-3"
+                className="bg-surface border border-indigo-500/20 rounded-2xl p-6 space-y-3"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <Shield className="w-4 h-4 text-indigo-400" />
@@ -661,7 +661,7 @@ const ProjectDetail = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.25 }}
-                className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6 space-y-3"
+                className="bg-surface border border-zinc-800 rounded-2xl p-6 space-y-3"
               >
                 <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">Your Project</h3>
 
