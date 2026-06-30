@@ -24,6 +24,9 @@ const AdminDashboard = () => {
   const [inviteRole, setInviteRole] = useState('Student');
   const [inviteLoading, setInviteLoading] = useState(false);
   const [lastEmailPreview, setLastEmailPreview] = useState('');
+  const [inviteMode, setInviteMode] = useState('single');
+  const [inviteStatusFilter, setInviteStatusFilter] = useState('');
+  const [inviteRoleFilter, setInviteRoleFilter] = useState('');
 
   const token = localStorage.getItem('token');
   const loggedInUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -179,6 +182,92 @@ const AdminDashboard = () => {
     } finally {
       setInviteLoading(false);
     }
+  };
+
+  const handleCsvUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target.result;
+        const lines = text.split(/\r?\n/);
+        if (lines.length <= 1) {
+          setErrorMsg('CSV file is empty or missing data rows');
+          return;
+        }
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const emailIdx = headers.indexOf('email');
+        const roleIdx = headers.indexOf('role');
+
+        if (emailIdx === -1) {
+          setErrorMsg("CSV must contain an 'email' column header.");
+          return;
+        }
+
+        const parsedInvites = [];
+        const validRoles = ['Student', 'Recruiter', 'Admin'];
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          const cols = line.split(',').map(c => c.trim());
+          const email = cols[emailIdx];
+          let role = roleIdx !== -1 && cols[roleIdx] ? cols[roleIdx] : 'Student';
+
+          if (role) {
+            role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+          }
+          if (!validRoles.includes(role)) {
+            role = 'Student';
+          }
+
+          if (email && email.includes('@')) {
+            parsedInvites.push({ email, role });
+          }
+        }
+
+        if (parsedInvites.length === 0) {
+          setErrorMsg('No valid email rows found in the CSV');
+          return;
+        }
+
+        setInviteLoading(true);
+        setErrorMsg('');
+        setSuccessMsg('');
+        setLastEmailPreview('');
+
+        const res = await axios.post(
+          `${backendUrl}/api/auth/invite/bulk`,
+          { invitations: parsedInvites },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const { successCount, failedCount, results } = res.data;
+        let msg = `Processed ${successCount + failedCount} invites: ${successCount} succeeded`;
+        if (failedCount > 0) {
+          msg += `, ${failedCount} failed`;
+        }
+        setSuccessMsg(msg);
+
+        const successWithPreview = results.find(r => r.success && r.previewUrl);
+        if (successWithPreview) {
+          setLastEmailPreview(successWithPreview.previewUrl);
+        }
+
+        fetchData();
+      } catch (err) {
+        console.error(err);
+        setErrorMsg(err.response?.data?.message || 'Error processing CSV file');
+      } finally {
+        setInviteLoading(false);
+        e.target.value = null;
+      }
+    };
+    reader.readAsText(file);
   };
 
   if (!loggedInUser || loggedInUser.role !== 'Admin') {
@@ -509,67 +598,148 @@ const AdminDashboard = () => {
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <Send className="w-4 h-4 text-indigo-400" /> Send Invite Link
                   </h3>
-                  <p className="text-xs text-zinc-400 mb-6">
-                    Enter the candidate email address and role. This sends an invitation link containing registration validation.
-                  </p>
                   
-                  <form onSubmit={handleSendInvite} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
-                        Recipient Email
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                        <input
-                          type="email"
-                          required
-                          value={inviteEmail}
-                          onChange={(e) => setInviteEmail(e.target.value)}
-                          placeholder="student@university.edu"
-                          className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
-                        Invite Role
-                      </label>
-                      <select
-                        value={inviteRole}
-                        onChange={(e) => setInviteRole(e.target.value)}
-                        className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                      >
-                        <option value="Student">Student</option>
-                        <option value="Recruiter">Recruiter</option>
-                        <option value="Admin">Admin</option>
-                      </select>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={inviteLoading}
-                      fullWidth
-                      className="mt-6 py-3 text-sm !rounded-xl font-semibold flex items-center justify-center gap-2"
+                  {/* Sub-tabs: Single / Bulk */}
+                  <div className="flex border-b border-zinc-800 mb-6">
+                    <button
+                      onClick={() => setInviteMode('single')}
+                      className={`flex-1 pb-3 text-center text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+                        inviteMode === 'single'
+                          ? 'border-indigo-500 text-indigo-400 font-bold'
+                          : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                      }`}
                     >
-                      {inviteLoading ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Send className="w-4 h-4" />
-                      )}
-                      Dispatch Invitation
-                    </Button>
-                  </form>
+                      Single Invite
+                    </button>
+                    <button
+                      onClick={() => setInviteMode('bulk')}
+                      className={`flex-1 pb-3 text-center text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+                        inviteMode === 'bulk'
+                          ? 'border-indigo-500 text-indigo-400 font-bold'
+                          : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      Bulk Import (CSV)
+                    </button>
+                  </div>
+
+                  {inviteMode === 'single' ? (
+                    <>
+                      <p className="text-xs text-zinc-400 mb-6">
+                        Enter the candidate email address and role. This sends an invitation link containing registration validation.
+                      </p>
+                      
+                      <form onSubmit={handleSendInvite} className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
+                            Recipient Email
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                            <input
+                              type="email"
+                              required
+                              value={inviteEmail}
+                              onChange={(e) => setInviteEmail(e.target.value)}
+                              placeholder="student@university.edu"
+                              className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
+                            Invite Role
+                          </label>
+                          <select
+                            value={inviteRole}
+                            onChange={(e) => setInviteRole(e.target.value)}
+                            className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          >
+                            <option value="Student">Student</option>
+                            <option value="Recruiter">Recruiter</option>
+                            <option value="Admin">Admin</option>
+                          </select>
+                        </div>
+
+                        <Button
+                          type="submit"
+                          disabled={inviteLoading}
+                          fullWidth
+                          className="mt-6 py-3 text-sm !rounded-xl font-semibold flex items-center justify-center gap-2"
+                        >
+                          {inviteLoading ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Send className="w-4 h-4" />
+                          )}
+                          Dispatch Invitation
+                        </Button>
+                      </form>
+                    </>
+                  ) : (
+                    <div className="space-y-6">
+                      <p className="text-xs text-zinc-400">
+                        Upload a CSV file containing candidate emails and roles to dispatch multiple invitations simultaneously.
+                      </p>
+                      
+                      <div className="border-2 border-dashed border-zinc-800 hover:border-indigo-500/50 rounded-2xl p-6 text-center transition-colors relative group">
+                        <Mail className="w-8 h-8 text-zinc-500 group-hover:text-indigo-400 mx-auto mb-3 transition-colors" />
+                        <label className="block text-sm font-semibold text-white mb-1 cursor-pointer">
+                          <span className="text-indigo-400 hover:text-indigo-300">Click to upload CSV file</span>
+                          <input
+                            type="file"
+                            accept=".csv"
+                            onChange={handleCsvUpload}
+                            disabled={inviteLoading}
+                            className="hidden"
+                          />
+                        </label>
+                        <span className="text-[11px] text-zinc-500">Supports column headers: <strong>email</strong>, <strong>role</strong></span>
+                      </div>
+
+                      <a 
+                        href="/sample_invitations.csv" 
+                        download="sample_invitations.csv"
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                      >
+                        <Check className="w-4 h-4 text-emerald-400 animate-pulse" /> Download Sample CSV Template
+                      </a>
+                    </div>
+                  )}
                 </Card>
               </div>
 
               {/* Sent Invitations Logs */}
               <div className="lg:col-span-2">
                 <Card className="p-0 overflow-hidden border border-zinc-800">
-                  <div className="px-6 py-4 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-center">
+                  <div className="px-6 py-4 border-b border-zinc-800 bg-zinc-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="font-bold text-white flex items-center gap-2">
                       <Clock className="w-4 h-4 text-indigo-400" /> Invitation Logs
                     </h3>
+                    
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                      <select
+                        value={inviteStatusFilter}
+                        onChange={(e) => setInviteStatusFilter(e.target.value)}
+                        className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-xl py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      >
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+                      
+                      <select
+                        value={inviteRoleFilter}
+                        onChange={(e) => setInviteRoleFilter(e.target.value)}
+                        className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-xl py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      >
+                        <option value="">All Roles</option>
+                        <option value="Student">Student</option>
+                        <option value="Recruiter">Recruiter</option>
+                        <option value="Admin">Admin</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -583,14 +753,24 @@ const AdminDashboard = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-800/40">
-                        {invitations.length === 0 ? (
-                          <tr>
-                            <td colSpan="4" className="px-6 py-12 text-center text-zinc-500">
-                              No previous invitation records found.
-                            </td>
-                          </tr>
-                        ) : (
-                          invitations.map((inv) => (
+                        {(() => {
+                          const filteredInvitations = invitations.filter((inv) => {
+                            const matchesStatus = inviteStatusFilter ? inv.status === inviteStatusFilter : true;
+                            const matchesRole = inviteRoleFilter ? inv.role === inviteRoleFilter : true;
+                            return matchesStatus && matchesRole;
+                          });
+
+                          if (filteredInvitations.length === 0) {
+                            return (
+                              <tr>
+                                <td colSpan="4" className="px-6 py-12 text-center text-zinc-500">
+                                  No matching invitation records found.
+                                </td>
+                              </tr>
+                            );
+                          }
+
+                          return filteredInvitations.map((inv) => (
                             <tr key={inv.id} className="hover:bg-zinc-800/5 transition-colors">
                               <td className="px-6 py-4 font-medium text-white flex items-center gap-2">
                                 <Mail className="w-4 h-4 text-zinc-500" />
@@ -612,8 +792,8 @@ const AdminDashboard = () => {
                                 </span>
                               </td>
                             </tr>
-                          ))
-                        )}
+                          ));
+                        })()}
                       </tbody>
                     </table>
                   </div>

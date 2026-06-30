@@ -90,6 +90,45 @@ class AuthService {
 
     return { user, authToken: generateUserToken(user) };
   }
+
+  async generateBulkInvites(invitationsList, frontendUrl = 'http://localhost:5173') {
+    if (!Array.isArray(invitationsList)) {
+      throw new Error('Invitations list must be an array');
+    }
+
+    const results = [];
+    let successCount = 0;
+    let failedCount = 0;
+
+    for (const invite of invitationsList) {
+      const { email, role } = invite;
+      try {
+        const res = await this.generateInviteLink(role || 'Student', email, frontendUrl);
+        results.push({
+          email,
+          role,
+          success: true,
+          previewUrl: res.previewUrl,
+          inviteLink: res.inviteLink
+        });
+        successCount++;
+      } catch (err) {
+        results.push({
+          email,
+          role,
+          success: false,
+          error: err.message
+        });
+        failedCount++;
+      }
+    }
+
+    return {
+      successCount,
+      failedCount,
+      results
+    };
+  }
 }
 
 module.exports = new AuthService();

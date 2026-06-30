@@ -71,8 +71,25 @@ const handleGoogleCallback = async (req, res) => {
   }
 };
 
+const generateBulkInvites = async (req, res) => {
+  try {
+    const { invitations } = req.body;
+    const origin = req.get('referer') || req.get('origin') || 'http://localhost:5173';
+    const frontendUrl = origin.endsWith('/') ? origin.slice(0, -1) : origin;
+
+    const result = await authService.generateBulkInvites(invitations, frontendUrl);
+    return res.status(201).json({
+      message: 'Bulk invitations processed',
+      ...result
+    });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   generateInvite,
+  generateBulkInvites,
   getInvitations,
   initiateGoogleAuth,
   handleGoogleCallback
