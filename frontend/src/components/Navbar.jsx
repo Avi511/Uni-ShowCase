@@ -43,6 +43,7 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
+
           {user?.role === 'Admin' && (
             <Link to="/admin" className="text-sm text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1.5 transition-colors">
               <Shield className="w-4 h-4 animate-pulse" /> Admin Dashboard
@@ -99,8 +100,9 @@ const Navbar = () => {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="md:hidden absolute top-full left-0 w-full glass border-t border-zinc-800/50 py-4 px-6 flex flex-col space-y-4"
+          className="md:hidden absolute top-full left-0 w-full bg-zinc-950/95 backdrop-blur-2xl shadow-2xl border-t border-zinc-800/50 py-4 px-6 flex flex-col space-y-4 z-50"
         >
+
           {user?.role === 'Admin' && (
             <Link to="/admin" className="text-sm text-indigo-400 font-medium flex items-center gap-1.5" onClick={() => setIsOpen(false)}>
               <Shield className="w-4 h-4" /> Admin Dashboard

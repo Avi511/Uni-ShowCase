@@ -96,7 +96,7 @@ const Features = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 max-w-2xl mx-auto"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-4">
             Everything you need in one portal
           </h2>
           <p className="text-zinc-400 text-lg">
@@ -114,7 +114,7 @@ const Features = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`group relative overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-800/50 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10 ${feature.colSpan}`}
+                className={`group relative overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-indigo-500/50 hover:bg-zinc-800/70 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/20 ${feature.colSpan}`}
               >
                 {/* Subtle gradient hover effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
