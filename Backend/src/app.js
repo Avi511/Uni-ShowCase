@@ -22,16 +22,31 @@ connectDB();
 initEventListeners();
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
+let frontendUrl = process.env.FRONTEND_URL || '';
+if (frontendUrl.endsWith('/')) {
+  frontendUrl = frontendUrl.slice(0, -1);
+}
+
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
+  frontendUrl,
   'http://localhost:5173',
   'http://localhost:3000'
 ].filter(Boolean);
 
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  // Dynamically allow Vercel previews and deployment domains
+  if (origin.endsWith('.vercel.app')) return true;
+  return false;
+};
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
+    if (isOriginAllowed(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true
 }));
@@ -39,7 +54,12 @@ app.use(cors({
 // ── Socket.io ────────────────────────────────────────────────────────────────
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS for sockets'));
+    },
     methods: ['GET', 'POST'],
     credentials: true
   }
